@@ -133,13 +133,9 @@ register_activation_hook(__FILE__, function(){
  * Plugin Updates
  */
 
-if(!class_exists( 'Plugin_Updater')){
-	include_once( plugin_dir_path( __FILE__ ) . 'updater/updater.php' );
-}
-$updater = new Smashing_Updater( __FILE__ );
-$updater->set_username('genoo-source');
-$updater->set_repository('wp-wpmktgengine-affiliate-wp');
- 
+include_once( plugin_dir_path( __FILE__ ) . 'deploy/updater.php' );
+wpme_updater_init(__FILE__);
+
 /**
  * Add basic auth
  */
