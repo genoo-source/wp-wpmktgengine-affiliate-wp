@@ -25,10 +25,10 @@ function wpme_get_github_version(){
  */
 function wpme_updater_init($file){
 
-  $GLOBALS['downloadLink'] = 'https://github.com/genoo-source/wp-wpmktgengine-affiliate-wp/archive/master.zip';
-  $GLOBALS['plugin'] = null;
-  $GLOBALS['basename'] = null;
-  $GLOBALS['active'] = null;
+  $GLOBALS['wpme_aff_downloadLink'] = 'https://github.com/genoo-source/wp-wpmktgengine-affiliate-wp/archive/master.zip';
+  $GLOBALS['wpme_aff_plugin'] = null;
+  $GLOBALS['wpme_aff_basename'] = null;
+  $GLOBALS['wpme_aff_active'] = null;
   static $version = null;
 
   /**
@@ -36,26 +36,26 @@ function wpme_updater_init($file){
    */
   add_action('admin_init', function() use ($file) {
     //  Get the basics
-    $GLOBALS['plugin'] = get_plugin_data($file);
-    $GLOBALS['basename'] = plugin_basename($file);
-    $GLOBALS['active'] = is_plugin_active($GLOBALS['basename']);
+    $GLOBALS['wpme_aff_plugin'] = get_plugin_data($file);
+    $GLOBALS['wpme_aff_basename'] = plugin_basename($file);
+    $GLOBALS['wpme_aff_active'] = is_plugin_active($GLOBALS['wpme_aff_basename']);
   });
 
   // Add update filter
   add_filter('site_transient_update_plugins', function($transient) use ($file, $version) {
     if($transient && property_exists( $transient, 'checked') ) {
-      if( $checked = $transient->checked && isset($GLOBALS['plugin'])) { 
+      if( $checked = $transient->checked && isset($GLOBALS['wpme_aff_plugin'])) { 
         $version = $version === null ? wpme_get_github_version() : $version;
-        $out_of_date = version_compare($version, $checked[$GLOBALS['basename']], 'gt' );
+        $out_of_date = version_compare($version, $GLOBALS['wpme_aff_plugin']['Version'], 'gt');
         if($out_of_date){
-          $slug = current(explode('/', $GLOBALS['basename']));
+          $slug = current(explode('/', $GLOBALS['wpme_aff_basename']));
           $plugin = array(
-            'url' => isset($GLOBALS['plugin']['PluginURI']) ? $GLOBALS['plugin']['PluginURI'] : '',
+            'url' => isset($GLOBALS['wpme_aff_plugin']['PluginURI']) ? $GLOBALS['wpme_aff_plugin']['PluginURI'] : '',
             'slug' => $slug,
-            'package' => $GLOBALS['downloadLink'],
+            'package' => $GLOBALS['wpme_aff_downloadLink'],
             'new_version' => $version,
           );
-          $transient->response[$GLOBALS['basename']] = (object)$plugin; 
+          $transient->response[$GLOBALS['wpme_aff_basename']] = (object)$plugin; 
         }
       }
     }
@@ -65,12 +65,12 @@ function wpme_updater_init($file){
   // Add pop up filter
   add_filter('plugins_api', function($result, $action, $args) use ($file, $version){
 		if( ! empty( $args->slug ) ) { // If there is a slug
-			if( $args->slug == current( explode( '/' , $GLOBALS['basename']))) { // And it's our slug
+			if( $args->slug == current( explode( '/' , $GLOBALS['wpme_aff_basename']))) { // And it's our slug
         $version = $version === null ? wpme_get_github_version() : $version;
         // Set it to an array
 				$plugin = array(
-					'name'				=> $GLOBALS['plugin']["Name"],
-					'slug'				=> $GLOBALS['basename'],
+					'name'				=> $GLOBALS['wpme_aff_plugin']["Name"],
+					'slug'				=> $GLOBALS['wpme_aff_basename'],
 					'requires'	  => '',
 					'tested'			=> '',
 					'rating'			=> '100.0',
@@ -78,16 +78,16 @@ function wpme_updater_init($file){
 					'downloaded'	=> '134',
 					'added'				=> '2016-01-05',
 					'version'			=> $version,
-					'author'			=> $GLOBALS['plugin']["AuthorName"],
-					'author_profile'	=> $GLOBALS['plugin']["AuthorURI"],
+					'author'			=> $GLOBALS['wpme_aff_plugin']["AuthorName"],
+					'author_profile'	=> $GLOBALS['wpme_aff_plugin']["AuthorURI"],
 					'last_updated'		=> '',
-					'homepage'			=> $GLOBALS['plugin']["PluginURI"],
-					'short_description' => $GLOBALS['plugin']["Description"],
+					'homepage'			=> $GLOBALS['wpme_aff_plugin']["PluginURI"],
+					'short_description' => $GLOBALS['wpme_aff_plugin']["Description"],
 					'sections'			=> array(
-						'Description'	=> $GLOBALS['plugin']["Description"],
+						'Description'	=> $GLOBALS['wpme_aff_plugin']["Description"],
 						'Updates'		=> $version,
 					),
-					'download_link'		=> $GLOBALS['downloadLink'],
+					'download_link'		=> $GLOBALS['wpme_aff_downloadLink'],
 				);
 				return (object)$plugin;
 			}
@@ -101,8 +101,8 @@ function wpme_updater_init($file){
     $install_directory = plugin_dir_path($file);
     $wp_filesystem->move( $result['destination'], $install_directory);
     $result['destination'] = $install_directory;
-    if ($GLOBALS['active']) { // If it was active
-			activate_plugin($GLOBALS['basename']); // Reactivate
+    if ($GLOBALS['wpme_aff_active']) { // If it was active
+			activate_plugin($GLOBALS['wpme_aff_basename']); // Reactivate
 		}
   }, 10, 3 );
 }
