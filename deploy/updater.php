@@ -96,7 +96,7 @@ function wpme_updater_init($file){
   }, 10, 3);
 
   // Add install filter
-	add_filter('upgrader_post_install', function($response, $hook_extra, $result) use($file) {
+  add_filter('upgrader_post_install', function($response, $hook_extra, $result) use($file) {
     global $wp_filesystem;
     $install_directory = plugin_dir_path($file);
     $wp_filesystem->move( $result['destination'], $install_directory);

@@ -1093,7 +1093,10 @@ add_action('affwp_insert_payout', function($payout_id){
             'amount' => $payout->amount,
             'payout_method' => $payout->payout_method,
             'status' => $payout->status,
-        ) + $affiliate_array_target;
+        );
+        if(is_array($affiliate_array_target)){
+          $arguments = array_merge($arguments, $affiliate_array_target);
+        }
         $query = http_build_query($arguments);
         $request = wpme_post_to_affilaite_api(
             'payouts?' . $query,
@@ -1135,7 +1138,10 @@ add_action('affwp_insert_referral', function($referral_id){
             'reference' => $referral->reference,
             'context' => $referral->context,
             'status' => $referral->status,
-        ) + $affiliate_array_target;
+        );
+        if(is_array($affiliate_array_target)){
+          $arguments = array_merge($arguments, $affiliate_array_target);
+        }
         $query = http_build_query($arguments);
         $request = wpme_post_to_affilaite_api(
             'referrals?' . $query,

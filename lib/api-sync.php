@@ -466,6 +466,7 @@ function wpme_api_get_affiliate_detection_from_core($affiliate_id_in_current){
             $user = wpme_api_create_core_affiliate($affiliate, $user_from_api->id);
             return array('affiliate_id' => $user->affiliate_id);
         }
+        return array();
     } catch (\Exception $e){
         throw new Exception($e->getMessage(), $e->getCode());
     }
