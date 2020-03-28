@@ -5,7 +5,7 @@
     Author:  Genoo, LLC
     Author URI: http://www.genoo.com/
     Author Email: info@genoo.com
-    Version: 1.2.70
+    Version: 1.2.071
     License: GPLv2
 */
 /*
@@ -741,6 +741,7 @@ add_filter('genoo_wpme_api_params', function($params, $action){
             }
             if(
                 array_key_exists(LEAD_META_REF, $_COOKIE)
+                && isset($params) && is_array($params['params'])
                 && !array_key_exists('ReferredByAffiliateID', $params['params'])
             ){
                 $params['params']['ReferredByAffiliateID'] = $_COOKIE[LEAD_META_REF];
