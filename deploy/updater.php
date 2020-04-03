@@ -14,7 +14,7 @@ function wpme_get_github_version(){
     )
   ), true);
   if(!is_array($response) || !array_key_exists('version', $response)){
-    throw new Error('No version returned');
+    return null;
   }
   $checked_version = $response['version'];
   return $response['version'];
