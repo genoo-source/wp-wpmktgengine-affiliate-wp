@@ -140,6 +140,7 @@ class GenooWpmeAffilaiteWP extends Genoo_Wpme_Api_Base
         $status = 'active'
     ){
         try {
+            // This calls an API
             $this->post('/affiliates/' . urlencode($email), (object)array(
                 'first_name' => (string)$first_name,
                 'last_name' => (string)$last_name,
