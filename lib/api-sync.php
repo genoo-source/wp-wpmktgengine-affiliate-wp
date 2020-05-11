@@ -15,7 +15,7 @@ function wpme_api_get_base_url(){
     if(isset($settings['wpmeAffDomain'])){
         return rtrim($settings['wpmeAffDomain'], '/') . '/';
     }
-    throw new Error(
+    throw new Exception(
         'The parent domain is not specified.',
         3301
     );
@@ -32,7 +32,7 @@ function wpme_api_get_api_headers_for($type = 'aff'){
         ||
         !isset($settings['wpmeAffApiToken'])
     ){
-        throw new Error(
+        throw new Exception(
             'Headers for Affilaites can\'t be set, because of missing Public Key or Token',
             3302
         );
@@ -106,7 +106,7 @@ function wpme_change_existing_username($id, $newUsername){
     global $wpdb;
     // Easy, kill of without this
     if(!is_object($wpdb)){
-        throw new Error('WPDB is not defined', 3304);
+        throw new Exception('WPDB is not defined', 3304);
     }
     // user_login
     // user_nicename
@@ -145,7 +145,6 @@ function wpme_api_update_user($user_from_api, $affilaite_id){
                     'method' => 'POST'
                 )
             );
-            // \Tracy\Debugger::barDump($request, 'Request - update a user');
             // Bad request
             wpme_check_request(
                 $request,
@@ -155,11 +154,11 @@ function wpme_api_update_user($user_from_api, $affilaite_id){
             // Ok, we're done
             return $request['response']['code'] === 200 ? json_decode($request['body']) : false;
         } else {
-            throw new Error('No affiliate found when updating mirror image in parent API.', 3305);
+            throw new Exception('No affiliate found when updating mirror image in parent API.', 3305);
         }
     } catch (\Exception $e){
         // Error
-        throw new Error('Error while updating affiliate user remotely, ' . $e->getMessage(), $e->getCode());
+        throw new Exception('Error while updating affiliate user remotely, ' . $e->getMessage(), $e->getCode());
     }
 }
 
@@ -289,7 +288,6 @@ function wpme_api_create_user($affilaite_id){
                     'method' => 'POST'
                 )
             );
-            // \Tracy\Debugger::barDump($request, 'Request - create a user');
             // Bad request
             wpme_check_request(
                 $request,
@@ -299,11 +297,11 @@ function wpme_api_create_user($affilaite_id){
             // Ok, we're done
             return $request['response']['code'] === 201 ? json_decode($request['body']) : false;
         } else {
-            throw new Error('No affiliate found when creating mirror image in parent API.', 3305);
+            throw new Exception('No affiliate found when creating mirror image in parent API.', 3305);
         }
     } catch (\Exception $e){
         // Error
-        throw new Error('Error while creating affiliate user remotely, ' . $e->getMessage(), $e->getCode());
+        throw new Exception('Error while creating affiliate user remotely, ' . $e->getMessage(), $e->getCode());
     }
 }
 
@@ -334,7 +332,6 @@ function wpme_api_create_core_affiliate($affiliate, $user_id){
                 'method' => 'POST'
             )
         );
-        // \Tracy\Debugger::barDump($request, 'Request - core affs');
         wpme_check_request(
             $request,
             'Error while creating an Affiliate out of Existing WordPress user in Core API.',
@@ -386,7 +383,7 @@ function wpme_check_request($request, $msg = 'Error while syncing user to the pa
             strpos($request['response']['code'], 5) === 0
         )
     ){
-        throw new Error(
+        throw new Exception(
             $msg . ' ' . $request->get_error_message(),
             $code
         );
@@ -404,10 +401,8 @@ function wpme_api_sync_user(\WP_User $user, $affiliate_id = null){
     // wpme_api_create_user
     $user_email = $user->user_email;
     try {
-        // \Tracy\Debugger::barDump($user_email, 'User Email for creating aff');
         // Get user from API
         $user_from_api = wpme_api_get_user_by_email($user_email);
-        // \Tracy\Debugger::barDump($user_from_api, 'Is in API?');
         if($user_from_api === null){
             // User doesn't exist, create him
             wpme_api_create_user($affiliate_id);
@@ -593,7 +588,6 @@ function wpme_patch_to_affilaite_api(
             'body' => $body
         )
     );
-    // \Tracy\Debugger::barDump($request, 'Request - patch aff api');
     // Bad request
     wpme_check_request(
         $request,
@@ -609,12 +603,12 @@ function wpme_patch_to_affilaite_api(
  */
 function wpme_affiliate_created($affilaite_id){
     // Exit early
-    if(wpme_aff_is_main_domain()){
-        return;
-    }
+    // if(wpme_aff_is_main_domain()){
+    //     return;
+    // }
     // Get user id from affilaite id
     $user_id = affwp_get_affiliate_user_id($affilaite_id);
-    if(is_int($user_id)){
+    if(!is_int($user_id)){
       return;
     }
     // Get user
@@ -681,7 +675,7 @@ function wpme_affiliate_updated($user_id){
       }
       // Cool, he's update here, and synce there
   } catch(\Exception $e){
-      //  throw new Error($e->getMessage(), $e->getCode());
+      //  throw new Exception($e->getMessage(), $e->getCode());
   }
 	try {
       $affiliate = \affwp_get_affiliate((int)affwp_get_affiliate_id($user_id));
@@ -698,7 +692,7 @@ function wpme_affiliate_updated($user_id){
       );
       // Cool, he's update here, and synce there
   } catch(\Exception $e){
-        // throw new Error($e->getMessage(), $e->getCode());
+        // throw new Exception($e->getMessage(), $e->getCode());
   }    
   // Cool, he is in the api, update the details
 }
@@ -706,7 +700,7 @@ function wpme_affiliate_updated($user_id){
 
 function getAffiliateWpLeadType(){
     $option = get_option('genooLeads');
-    if($option['genooLeadUserAffiliate']){
+    if(isset($option['genooLeadUserAffiliate'])){
         return (int)$option['genooLeadUserAffiliate'];
     }
     return false;
