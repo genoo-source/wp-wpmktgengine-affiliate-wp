@@ -312,7 +312,7 @@ add_action('after_setup_theme', function(){
         $cookieSet = wpme_get_affiliate_by_hash($cookieSet);
         // These two cookies exist, but they don't match
         if(($cookieSet !== null) && ($cookieSetMain !== null) && ($cookieSet !== $cookieSetMain)){
-          // We have been transfarred by the id is different
+          // We have been transferred by the id is different
           $refName = affiliate_wp()->settings->get('referral_var', 'ref');
           // Set new value
           $_GET[$refName] = $cookieSet;
