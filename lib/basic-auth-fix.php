@@ -38,25 +38,34 @@ add_filter('determine_current_user', 'wpme_determine_current_user', 19, 1);
 
 
 // Give me email
-register_rest_field( 'user', 'user_email',
+register_rest_field('user', 'user_email',
     array(
         'get_callback'    => function ($user){
-            return $user['email'];
+          $user = get_user_by('id', $user['id']);
+          if(!$user){
+            return "";
+          }
+          return $user->user_email;
         },
         'update_callback' => null,
         'schema'          => null,
     )
 );
-register_rest_field( 'user', 'user_name',
+register_rest_field('user', 'user_name',
     array(
         'get_callback'    => function ($user){
-            return $user['username'];
+          // user_login
+          $user = get_user_by('id', $user['id']);
+          if(!$user){
+            return "";
+          }
+          return $user->user_login;
         },
         'update_callback' => null,
         'schema'          => null,
     )
 );
-register_rest_field( 'user', 'affiliate_id',
+register_rest_field('user', 'affiliate_id',
     array(
         'get_callback'    => function ($user){
             if(!function_exists('affwp_get_affiliate_id')){
@@ -68,3 +77,22 @@ register_rest_field( 'user', 'affiliate_id',
         'schema'          => null,
     )
 );
+// Affiliates, add user_email
+register_rest_field('affwp_affiliate', 'user_email',
+    array(
+        'get_callback'    => function ($object){
+            if(!function_exists('affwp_get_affiliate_user_id') || !$object){
+              return '';
+            }
+            $userId = affwp_get_affiliate_user_id($object->ID);
+            $user = get_user_by('id', $userId);
+            if(!$user){
+              return '';
+            }
+            return $user->user_email;
+        },
+        'update_callback' => null,
+        'schema'          => null,
+    )
+);
+// 

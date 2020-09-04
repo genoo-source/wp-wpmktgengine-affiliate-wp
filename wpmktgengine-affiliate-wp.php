@@ -5,7 +5,7 @@
     Author:  Genoo, LLC
     Author URI: http://www.genoo.com/
     Author Email: info@genoo.com
-    Version: 1.3.5
+    Version: 1.3.7
     License: GPLv2
 */
 /*
@@ -186,10 +186,10 @@ add_action('init', function(){
  * ========================================================================================
  */
 
- function WPMEgetApiv2(){
+function WPMEgetApiv2(){
     global $WPME_API;
     return $WPME_API;
- }
+}
 
 /**
  * Change status
@@ -209,7 +209,8 @@ add_action('affwp_set_affiliate_status', function($affiliate_id, $status, $old_s
   // $affiliate_user->add_role(LEAD_ROLE);
   // Get API
   $api = WPMEgetApiv2();
-  wpme_affiliate_updated((int)$affiliate->user_id);
+  wpme_simple_log('Status should be updated to: ' . $status . ' from: ' . $old_status);
+  wpme_affiliate_updated((int)$affiliate->user_id, $status);
   // Get lead id
   if($api !== FALSE){
       try {
@@ -1251,7 +1252,7 @@ function wpme_affiliate_referral_update(
 /**
  * Track new visit
  */
-add_action( 'affwp_post_insert_visit', function($id, $data){
+add_action('affwp_post_insert_visit', function($id, $data){
   // Exit early
   if(wpme_aff_is_main_domain()){
       return;

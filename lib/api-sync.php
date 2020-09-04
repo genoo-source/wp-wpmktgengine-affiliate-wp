@@ -183,28 +183,28 @@ function wpme_api_sync_get_affiliate($checkMail, $domain, $argsAff){
       $domain . 'wp-json/affwp/v1/affiliates?number=9999',
       $argsAff
   );
-  wpme_simple_log('Get aff response ' . var_export($request, true));
+  // wpme_simple_log('Get aff response ' . var_export($request, true));
   if(is_wp_error($request)){
     return false;
   }
   $body = json_decode($request['body']);
-  wpme_simple_log('Body ' . var_export($body, true));
   // Do we have a winner?
   $foundUser = false;
   foreach($body as $affiliateUser){
-    wpme_simple_log('Find ' . $checkMail . ' === ' . $affiliateUser->payment_email);
-    if($affiliateUser->payment_email === $checkMail){
+    // wpme_simple_log('Find ' . $checkMail . ' === ' . $affiliateUser->payment_email ;.' || ' . $affiliateUser->user_email);
+    if($affiliateUser->payment_email === $checkMail || $affiliateUser->user_email === $checkMail){
       $foundUser = $affiliateUser;
       break;
     }
   }
+  wpme_simple_log('Found user ' . var_export($foundUser, true));
   return $foundUser;
 }
 
 /**
  * Update Aff status
  */
-function wpme_api_sync_affiliate_status_change($affilaite_id){
+function wpme_api_sync_affiliate_status_change($affilaite_id, $new_status = null){
   if(wpme_aff_is_main_domain()){
     return;
   }
@@ -220,11 +220,12 @@ function wpme_api_sync_affiliate_status_change($affilaite_id){
     $affiliate_user = new \WP_User((int)$affiliate->user_id);
     $affiliate_email = $affiliate_user->user_email;
     $affiliate_id_remote = wpme_api_sync_get_affiliate($affiliate_email, $domain, $argsAff);
+    wpme_simple_log('Got remote user, ' . var_export($affiliate_id_remote, true));
     if(!is_object($affiliate_id_remote)){
       return;
     }
     $arguments = array(
-      'status' => $affiliate->status,
+      'status' => $new_status == null ? $affiliate->status : $new_status,
       'rate' => $affiliate->rate,
       'user_id' => $affiliate_id_remote->user_id,
       'rate_type' => $affiliate->rate_type,
@@ -232,13 +233,12 @@ function wpme_api_sync_affiliate_status_change($affilaite_id){
       'account_email' => $affiliate_user->user_email
     );
     $query = http_build_query($arguments);
-    $request = @wp_remote_post(
-      $domain . 'wp-json/affwp/v1/affiliates/' . $affiliate_id_remote->affiliate_id . '?' . $query,
-      array(
-        'headers' => $argsAff['headers'],
-        'method' => 'POST'
-      )
+    wpme_simple_log('Status to be: ' . $affiliate->status);
+    wpme_simple_log('Updating post request to affiliates ' . 'wp-json/affwp/v1/affiliates/' . $affiliate_id_remote->affiliate_id . '?' . $query);
+    $request = wpme_patch_to_affilaite_api(
+      'affiliates/' . $affiliate_id_remote->affiliate_id . '?' . $query,
     );
+    wpme_simple_log('Got this back: ' . var_export($request, true));
     wpme_check_request(
         $request,
         'WP Update user status failed.',
@@ -638,7 +638,7 @@ function wpme_affiliate_created($affilaite_id){
  * @param $user_id
  * @throws \Error
  */
-function wpme_affiliate_updated($user_id){
+function wpme_affiliate_updated($user_id, $new_status = null){
   // Exit early
   if(wpme_aff_is_main_domain()){
         return;
@@ -671,9 +671,9 @@ function wpme_affiliate_updated($user_id){
           // He is in the api? Awesome, update him there too
           wpme_api_update_user($user_from_api, (int)affwp_get_affiliate_id($user_id));
           // Update affiliate user
-          wpme_api_sync_affiliate_status_change((int)affwp_get_affiliate_id($user_id));
+          wpme_api_sync_affiliate_status_change((int)affwp_get_affiliate_id($user_id), $new_status);
       }
-      // Cool, he's update here, and synce there
+      // Cool, he's update here, and sync there
   } catch(\Exception $e){
       //  throw new Exception($e->getMessage(), $e->getCode());
   }
