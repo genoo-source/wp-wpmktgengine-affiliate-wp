@@ -236,7 +236,7 @@ function wpme_api_sync_affiliate_status_change($affilaite_id, $new_status = null
     wpme_simple_log('Status to be: ' . $affiliate->status);
     wpme_simple_log('Updating post request to affiliates ' . 'wp-json/affwp/v1/affiliates/' . $affiliate_id_remote->affiliate_id . '?' . $query);
     $request = wpme_patch_to_affilaite_api(
-      'affiliates/' . $affiliate_id_remote->affiliate_id . '?' . $query,
+      'affiliates/' . $affiliate_id_remote->affiliate_id . '?' . $query
     );
     wpme_simple_log('Got this back: ' . var_export($request, true));
     wpme_check_request(
@@ -690,7 +690,7 @@ function wpme_affiliate_updated($user_id, $new_status = null){
           $user_email,
           $affiliate->status
       );
-      // Cool, he's update here, and synce there
+      // Cool, he's update here, and sync there
   } catch(\Exception $e){
         // throw new Exception($e->getMessage(), $e->getCode());
   }    
