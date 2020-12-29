@@ -22,5 +22,5 @@ WPMktgEngine AffiliateWP Extension
 
 == Changelog ==
 
-= 1.4.0 = 
+= 1.4.1 = 
 * Fixed Auth issue with My Account Page

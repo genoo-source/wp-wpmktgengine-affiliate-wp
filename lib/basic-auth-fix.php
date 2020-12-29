@@ -7,7 +7,7 @@
 
 function wpme_determine_current_user($user_id){
   	if (!defined('REST_REQUEST')) {
-   		return;
+   		return $user_id;
 	  }
     if(is_array($_SERVER) && function_exists('affiliate_wp')){
         $auth = false;
