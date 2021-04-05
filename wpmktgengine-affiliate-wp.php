@@ -5,7 +5,7 @@
     Author:  Genoo, LLC
     Author URI: http://www.genoo.com/
     Author Email: info@genoo.com
-    Version: 1.4.1
+    Version: 1.4.2
     License: GPLv2
 */
 /*
@@ -134,7 +134,7 @@ register_activation_hook(__FILE__, function(){
  */
 
 include_once( plugin_dir_path( __FILE__ ) . 'deploy/updater.php' );
-wpme_updater_init(__FILE__);
+wpme_affiliate_updater_init(__FILE__);
 
 /**
  * Add basic auth

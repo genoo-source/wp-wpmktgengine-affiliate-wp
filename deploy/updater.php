@@ -3,7 +3,7 @@
  * Get Github Latest Version
  */
 
-function wpme_get_github_version(){
+function wpme_affiliate_get_github_version(){
   static $checked_version = null;
   if($checked_version !== null){
     return $checked_version;
@@ -23,7 +23,7 @@ function wpme_get_github_version(){
 /**
  * Updater init
  */
-function wpme_updater_init($file){
+function wpme_affiliate_updater_init($file){
 
   $GLOBALS['wpme_aff_downloadLink'] = 'https://github.com/genoo-source/wp-wpmktgengine-affiliate-wp/archive/master.zip';
   $GLOBALS['wpme_aff_plugin'] = null;
@@ -45,7 +45,7 @@ function wpme_updater_init($file){
   add_filter('site_transient_update_plugins', function($transient) use ($file, $version) {
     if($transient && property_exists( $transient, 'checked') ) {
       if( $checked = $transient->checked && isset($GLOBALS['wpme_aff_plugin'])) { 
-        $version = $version === null ? wpme_get_github_version() : $version;
+        $version = $version === null ? wpme_affiliate_get_github_version() : $version;
         $out_of_date = version_compare($version, $GLOBALS['wpme_aff_plugin']['Version'], 'gt');
         if($out_of_date){
           $slug = current(explode('/', $GLOBALS['wpme_aff_basename']));
@@ -66,7 +66,7 @@ function wpme_updater_init($file){
   add_filter('plugins_api', function($result, $action, $args) use ($file, $version){
 		if( ! empty( $args->slug ) ) { // If there is a slug
 			if( $args->slug == current( explode( '/' , $GLOBALS['wpme_aff_basename']))) { // And it's our slug
-        $version = $version === null ? wpme_get_github_version() : $version;
+        $version = $version === null ? wpme_affiliate_get_github_version() : $version;
         // Set it to an array
 				$plugin = array(
 					'name'				=> $GLOBALS['wpme_aff_plugin']["Name"],
