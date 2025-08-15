@@ -1172,11 +1172,10 @@ add_action('affwp_insert_referral', function($referral_id){
               array(
                   'custom' => $created_referral->referral_id
               ),
-              ''
+              '',
+              'referral'
           );
-        },
-            'referral'
-        );
+        }
         // I think we're done here yay
     } catch (\Exception $e){
         // TODO: Log
