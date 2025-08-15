@@ -374,19 +374,15 @@ function wpme_parse_name($fullName = ''){
  * @throws \Error
  */
 function wpme_check_request($request, $msg = 'Error while syncing user to the parent API.', $code = 3333){
-    if(
-        !is_array($request)
-        ||
-        (
-            is_array($request)
-            &&
-            strpos($request['response']['code'], 5) === 0
-        )
-    ){
-        throw new Exception(
-            $msg . ' ' . $request->get_error_message(),
-            $code
-        );
+    if (is_wp_error($request)) {
+        throw new Exception($msg . ' ' . $request->get_error_message(), $code);
+    }
+    if (!is_array($request) || !isset($request['response']['code'])) {
+        throw new Exception($msg . ' Invalid HTTP response.', $code);
+    }
+    $httpCode = (int) $request['response']['code'];
+    if ($httpCode >= 500) {
+        throw new Exception($msg . ' HTTP ' . $httpCode, $code);
     }
 }
 
