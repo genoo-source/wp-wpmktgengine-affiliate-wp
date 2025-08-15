@@ -27,15 +27,6 @@
 */
 
 if (version_compare(PHP_VERSION, '7.4.0', '<')) {
-    if (is_admin()) {
-        add_action('admin_notices', function(){
-            ?>
-            <div class="notice notice-error">
-                <p><strong>Affiliate-wp - WPMktgEngine Extension</strong> requires PHP 7.4 or higher. Current version: <?php echo esc_html(PHP_VERSION); ?>.</p>
-            </div>
-            <?php
-        });
-    }
     return;
 }
 
