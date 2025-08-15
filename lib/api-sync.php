@@ -516,6 +516,9 @@ function wpme_decrypt_string($string, $crypto = WPME_CRYPTO){
  * @return bool
  */
 function wpme_affwp_get_affiliate_by_email($affiliate){
+    if (!function_exists('affiliate_wp')) {
+        return false;
+    }
     if ( $user = get_user_by('email', $affiliate ) ) {
         if ( $affiliate = affiliate_wp()->affiliates->get_by( 'user_id', $user->ID ) ) {
             return (int)$affiliate->affiliate_id;

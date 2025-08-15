@@ -361,7 +361,9 @@ function wpme_might_have_affiliate(){
   // If found, set as a cookie
   if(is_int($affiliate_id_from_hash) && $affiliate_id_from_hash > 0){
     // Set cookie
-    affiliate_wp()->tracking->set_affiliate_id($affiliate_id_from_hash);
+    if(function_exists('affiliate_wp')){
+      affiliate_wp()->tracking->set_affiliate_id($affiliate_id_from_hash);
+    }
   }
 }
 
@@ -482,7 +484,10 @@ function wpmeRemoveCookie($name){
  * Cookie time depending on AFF settings
  */
 function wpme_get_cookie_aff_time(){
-  return strtotime('+' . affiliate_wp()->tracking->get_expiration_time() . ' days');
+  if(function_exists('affiliate_wp')){
+    return strtotime('+' . affiliate_wp()->tracking->get_expiration_time() . ' days');
+  }
+  return strtotime('+30 days');
 }
 
 /**
@@ -1156,12 +1161,15 @@ add_action('affwp_insert_referral', function($referral_id){
         // Get created referal
         $created_referral = json_decode($request['body']);
         // Created referral, now we can update ours with the "ID" from the core one ...
-        affiliate_wp()->referrals->update(
-            $referral_id,
-            array(
-                'custom' => $created_referral->referral_id
-            ),
-            '',
+        if(function_exists('affiliate_wp')){
+          affiliate_wp()->referrals->update(
+              $referral_id,
+              array(
+                  'custom' => $created_referral->referral_id
+              ),
+              ''
+          );
+        },
             'referral'
         );
         // I think we're done here yay
