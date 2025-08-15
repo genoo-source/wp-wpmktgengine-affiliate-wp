@@ -5,7 +5,8 @@
     Author:  Genoo, LLC
     Author URI: http://www.genoo.com/
     Author Email: info@genoo.com
-    Version: 1.4.2
+    Version: 1.4.7
+    Requires PHP: 7.4
     License: GPLv2
 */
 /*
@@ -24,6 +25,10 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
+if (version_compare(PHP_VERSION, '7.4.0', '<')) {
+    return;
+}
 
 // Constants
 define('LEAD_COOKIE', '_gtld');
@@ -317,11 +322,12 @@ add_action('after_setup_theme', function(){
           $refName = affiliate_wp()->settings->get('referral_var', 'ref');
           // Set new value
           $_GET[$refName] = $cookieSet;
-          $_GLOBALS[$refName] = $cookieSet;
           $_COOKIE[$refName] = $cookieSet;
           // Set real cookie
-          affiliate_wp()->tracking->set_affiliate_id($cookieSet);
-          affiliate_wp()->tracking->fallback_track_visit();
+          if(function_exists('affiliate_wp')){
+            affiliate_wp()->tracking->set_affiliate_id($cookieSet);
+            affiliate_wp()->tracking->fallback_track_visit();
+          }
           $affiliate_id = $cookieSet;
         }
     }
@@ -360,7 +366,9 @@ function wpme_might_have_affiliate(){
   // If found, set as a cookie
   if(is_int($affiliate_id_from_hash) && $affiliate_id_from_hash > 0){
     // Set cookie
-    affiliate_wp()->tracking->set_affiliate_id($affiliate_id_from_hash);
+    if(function_exists('affiliate_wp')){
+      affiliate_wp()->tracking->set_affiliate_id($affiliate_id_from_hash);
+    }
   }
 }
 
@@ -481,7 +489,10 @@ function wpmeRemoveCookie($name){
  * Cookie time depending on AFF settings
  */
 function wpme_get_cookie_aff_time(){
-  return strtotime('+' . affiliate_wp()->tracking->get_expiration_time() . ' days');
+  if(function_exists('affiliate_wp')){
+    return strtotime('+' . affiliate_wp()->tracking->get_expiration_time() . ' days');
+  }
+  return strtotime('+30 days');
 }
 
 /**
@@ -616,7 +627,7 @@ add_filter('genoo_wpme_lead_creation_attributes', function($atts, $type){
                     $added = true;
                 }
             }
-            if($_COOKIE[LEAD_META_SOLD]){
+            if(!empty($_COOKIE[LEAD_META_SOLD])){
               $atts['c00referred_by_affiliate_id_date'] = \WPME\Ecommerce\Utils::getDateTime();
               $atts['c00sold_by_affiliate_id'] = $_COOKIE[LEAD_META_SOLD];
               $atts['c00referred_by_affiliate_id'] = $_COOKIE[LEAD_META_REF];
@@ -742,7 +753,7 @@ add_filter('genoo_wpme_api_params', function($params, $action){
             }
             if(
                 array_key_exists(LEAD_META_REF, $_COOKIE)
-                && isset($params) && is_array($params['params'])
+                && isset($params['params']) && is_array($params['params'])
                 && !array_key_exists('ReferredByAffiliateID', $params['params'])
             ){
                 $params['params']['ReferredByAffiliateID'] = $_COOKIE[LEAD_META_REF];
@@ -751,7 +762,7 @@ add_filter('genoo_wpme_api_params', function($params, $action){
             }
             if(
                 array_key_exists(LEAD_META_SOLD, $_COOKIE)
-                && isset($params) && is_array($params['params'])
+                && isset($params['params']) && is_array($params['params'])
                 && !array_key_exists('SoldByAffiliateID', $params['params'])
             ){
                 $params['params']['SoldByAffiliateID'] = $_COOKIE[LEAD_META_SOLD];
@@ -759,7 +770,7 @@ add_filter('genoo_wpme_api_params', function($params, $action){
             return $params;
           case '/leads':
             // If we're creating leads, and it's just one, and aff is enabled
-            if(is_array($params['leads']) && count($params['leads']) === 1 && function_exists('affwp_get_affiliate_email')){
+            if(isset($params['leads']) && is_array($params['leads']) && count($params['leads']) === 1 && function_exists('affwp_get_affiliate_email')){
               // We are creating a lead
               $arrayToCheck = [LEAD_META_REF, LEAD_META_REF_DATE, LEAD_META_SOLD];
               foreach($arrayToCheck as $cookieToCheck){
@@ -1155,14 +1166,16 @@ add_action('affwp_insert_referral', function($referral_id){
         // Get created referal
         $created_referral = json_decode($request['body']);
         // Created referral, now we can update ours with the "ID" from the core one ...
-        affiliate_wp()->referrals->update(
-            $referral_id,
-            array(
-                'custom' => $created_referral->referral_id
-            ),
-            '',
-            'referral'
-        );
+        if(function_exists('affiliate_wp')){
+          affiliate_wp()->referrals->update(
+              $referral_id,
+              array(
+                  'custom' => $created_referral->referral_id
+              ),
+              '',
+              'referral'
+          );
+        }
         // I think we're done here yay
     } catch (\Exception $e){
         // TODO: Log
@@ -1341,7 +1354,7 @@ function wpme_inject_auth($rules)
     // If not, add them in
     if(!$rulesContainAuthCond && !$rulesContainAuthRule){
         array_splice($rulesExpanded, $rulesKeyBefore + 1, 0, $rulesToInject);
-        return implode($rulesExpanded, PHP_EOL);
+        return implode(PHP_EOL, $rulesExpanded);
     }
     return $rules;
 }

@@ -6,7 +6,11 @@ PLUGIN_NEXT_VERSION=$(echo $PLUGIN_CURRENT_VERSION | awk -F. -v OFS=. 'NF==1{pri
 
 # Replace versions with new version
 # - In main file
-sed -i "" "s/${PLUGIN_CURRENT_VERSION}/${PLUGIN_NEXT_VERSION}/g" wpmktgengine-affiliate-wp.php
+if sed --version >/dev/null 2>&1; then
+  sed -i "s/${PLUGIN_CURRENT_VERSION}/${PLUGIN_NEXT_VERSION}/g" wpmktgengine-affiliate-wp.php
+else
+  sed -i "" "s/${PLUGIN_CURRENT_VERSION}/${PLUGIN_NEXT_VERSION}/g" wpmktgengine-affiliate-wp.php
+fi
 # - In versin file
 echo "{\"version\": \"${PLUGIN_NEXT_VERSION}\"}" > version.json
 
