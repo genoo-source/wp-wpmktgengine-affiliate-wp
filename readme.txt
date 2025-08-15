@@ -6,7 +6,7 @@ Requires PHP: 7.4
 Tested up to: 8.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Stable tag: 1.4.6
+Stable tag: 1.4.7
 
 
 WPMktgEngine AffiliateWP Extension
