@@ -2,7 +2,7 @@
 Contributors: Genoo
 Tags: email marketing automation, landing page builder, email marketing, lead generation, online marketing, CRM
 Requires at least: 4.6.0
-Tested up to: 5.
+Tested up to: 6.8.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Stable tag: 1.4.6
