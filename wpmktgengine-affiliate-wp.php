@@ -6,6 +6,7 @@
     Author URI: http://www.genoo.com/
     Author Email: info@genoo.com
     Version: 1.4.6
+    Requires PHP: 7.4
     License: GPLv2
 */
 /*
@@ -24,6 +25,19 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
+if (version_compare(PHP_VERSION, '7.4.0', '<')) {
+    if (is_admin()) {
+        add_action('admin_notices', function(){
+            ?>
+            <div class="notice notice-error">
+                <p><strong>Affiliate-wp - WPMktgEngine Extension</strong> requires PHP 7.4 or higher. Current version: <?php echo esc_html(PHP_VERSION); ?>.</p>
+            </div>
+            <?php
+        });
+    }
+    return;
+}
 
 // Constants
 define('LEAD_COOKIE', '_gtld');
